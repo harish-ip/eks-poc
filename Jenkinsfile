@@ -2,49 +2,37 @@ pipeline {
     agent any
 
     environment {
-        registry = "211223789150.dkr.ecr.us-east-1.amazonaws.com/eks-poc-1"
+        registry = "339712821622.dkr.ecr.eu-north-1.amazonaws.com/eks-poc-1"
     }
     stages {
-        stage('Checkout') {
+        stage('Checkout Code') {
             steps {
-                checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/']])
+                git branch: 'main', 
+                   credentialsId: 'b3972f1b-1784-46d2-afef-27b5833a4683', // Replace with your credentials ID
+                   url: 'https://github.com/harish-ip/eks-poc.git' // Replace with your repo URL
             }
         }
-        
-        stage ("Build JAR") {
+        stage('Build') {
             steps {
-                sh "mvn clean install"
+                sh 'mvn clean install'
             }
-        }
+        }   
+        // stage ("Build Image") {
+        //     steps {
+        //         script {
+        //             docker.build registry
+        //         }
+        //     }
+        // }
         
-        stage ("Build Image") {
-            steps {
-                script {
-                    docker.build registry
-                }
-            }
-        }
-        
-        stage ("Push to ECR") {
-            steps {
-                script {
-                    sh "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 211223789150.dkr.ecr.us-east-1.amazonaws.com"
-                    sh "docker push 211223789150.dkr.ecr.us-east-1.amazonaws.com/eks-poc-1:latest"
+        // stage ("Push to ECR") {
+        //     steps {
+        //         script {
+        //             sh "aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin 339712821622.dkr.ecr.eu-north-1.amazonaws.com"
+        //             sh "docker push 339712821622.dkr.ecr.eu-north-1.amazonaws.com/eks-poc-1"
                     
-                }
-            }
-        }
-        
-        // stage ("Helm package") {
-        //     steps {
-        //             sh "helm package springboot"
         //         }
         //     }
-                
-        // stage ("Helm install") {
-        //     steps {
-        //             sh "helm upgrade myrelease-21 springboot-0.1.0.tgz"
-        //         }
-        //     }
+        // }
     }
 }

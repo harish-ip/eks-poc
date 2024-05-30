@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-app
+  namespace: eks-poc
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: demo-app
+  template:
+    metadata:
+      labels:
+        app: demo-app
+    spec:
+      containers:
+        - name: demo-app-container
+          image: 339712821622.dkr.ecr.eu-north-1.amazonaws.com/eks-poc-1
+          ports:
+            - containerPort: 8080
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-app-service
+  namespace: eks-poc
+spec:
+  selector:
+    app: demo-app
+  ports:
+   - protocol: TCP
+     port: 8080
+     targetPort: 8080
+  type: LoadBalancer
